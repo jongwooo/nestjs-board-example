@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Board } from './board.entity';
 import { BoardRepository } from './board.repository';
 import { BoardStatus } from './board-status.enum';
@@ -8,23 +8,52 @@ import { CreateBoardDto } from './dto/create-board.dto';
 export class BoardService {
   constructor(private boardRepository: BoardRepository) {}
 
-  createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
-    return this.boardRepository.createBoard(createBoardDto);
+  async createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
+    const { title, description } = createBoardDto;
+
+    const board = this.boardRepository.create({
+      title,
+      description,
+      status: BoardStatus.PUBLIC,
+    });
+
+    await this.boardRepository.save(board);
+    return board;
   }
 
   getAllBoards(): Promise<Board[]> {
-    return this.boardRepository.getAllBoards();
+    const found = this.boardRepository.find();
+
+    if (!found) {
+      throw new NotFoundException(`Can't find Board`);
+    }
+
+    return found;
   }
 
   getBoardById(id: number): Promise<Board> {
-    return this.boardRepository.getBoardById(id);
+    const found = this.boardRepository.findOne({ where: { id } });
+
+    if (!found) {
+      throw new NotFoundException(`Can't find Board with id ${id}`);
+    }
+
+    return found;
   }
 
-  updateBoardStatus(id: number, status: BoardStatus): Promise<Board> {
-    return this.boardRepository.updateBoardStatus(id, status);
+  async updateBoardStatus(id: number, status: BoardStatus): Promise<Board> {
+    const board = await this.getBoardById(id);
+    board.status = status;
+
+    await this.boardRepository.save(board);
+    return board;
   }
 
-  deleteBoard(id: number): Promise<void> {
-    return this.boardRepository.deleteBoard(id);
+  async deleteBoard(id: number): Promise<void> {
+    const result = await this.boardRepository.delete(id);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Can't find Board with id ${id}`);
+    }
   }
 }
