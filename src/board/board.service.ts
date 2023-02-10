@@ -21,8 +21,8 @@ export class BoardService {
     return board;
   }
 
-  getAllBoards(): Promise<Board[]> {
-    const found = this.boardRepository.find();
+  async getAllBoards(): Promise<Board[]> {
+    const found = await this.boardRepository.find();
 
     if (!found) {
       throw new NotFoundException(`Can't find Board`);
@@ -31,8 +31,8 @@ export class BoardService {
     return found;
   }
 
-  getBoardById(id: number): Promise<Board> {
-    const found = this.boardRepository.findOne({ where: { id } });
+  async getBoardById(id: number): Promise<Board> {
+    const found = await this.boardRepository.findOne({ where: { id } });
 
     if (!found) {
       throw new NotFoundException(`Can't find Board with id ${id}`);
