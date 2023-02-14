@@ -22,30 +22,30 @@ export class BoardController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  createBoard(@Body() createBoardDto: CreateBoardDto): Promise<Board> {
-    return this.boardService.createBoard(createBoardDto);
+  async createBoard(@Body() createBoardDto: CreateBoardDto): Promise<Board> {
+    return await this.boardService.createBoard(createBoardDto);
   }
 
   @Get()
-  getAllBoards(): Promise<Board[]> {
-    return this.boardService.getAllBoards();
+  async getAllBoards(): Promise<Board[]> {
+    return await this.boardService.getAllBoards();
   }
 
   @Get('/:id')
-  getBoardById(@Param('id') id: number): Promise<Board> {
-    return this.boardService.getBoardById(id);
+  async getBoardById(@Param('id') id: number): Promise<Board> {
+    return await this.boardService.getBoardById(id);
   }
 
   @Patch('/:id/status')
-  updateBoardStatus(
+  async updateBoardStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body('status', BoardStatusValidationPipe) status: BoardStatus,
   ): Promise<Board> {
-    return this.boardService.updateBoardStatus(id, status);
+    return await this.boardService.updateBoardStatus(id, status);
   }
 
   @Delete('/:id')
-  deleteBoard(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.boardService.deleteBoard(id);
+  async deleteBoard(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return await this.boardService.deleteBoard(id);
   }
 }
